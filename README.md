@@ -56,6 +56,11 @@ cd ${KF_DIR}
 kfctl apply -V -f ${CONFIG_URI}
 ```
 
+**check status while it sets up**
+```bash
+kubectl get pod -n kubeflow
+```
+
 ### Open Central Dashboard
 ```
 kubectl port-forward -n istio-system svc/istio-ingressgateway 8080:80

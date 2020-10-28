@@ -1,6 +1,6 @@
 set -e
 
-KF_PATH="~/.kubeflow/v1.0"
+KF_PATH="$HOME/.kubeflow/v1.0"
 mkdir -p $KF_PATH
 cd $KF_PATH
 wget https://github.com/kubeflow/kfctl/releases/download/v1.0/kfctl_v1.0-0-g94c35cf_linux.tar.gz
