@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: test-pipeline-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.0.4, pipelines.kubeflow.org/pipeline_compilation_time: '2020-11-05T20:15:15.657700',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "....", "inputs": [{"default":
+      "10", "name": "epochs", "optional": true, "type": "Integer"}, {"default": "6",
+      "name": "n_layers", "optional": true, "type": "Integer"}], "name": "test-pipeline"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.0.4}
+spec:
+  entrypoint: test-pipeline
+  templates:
+  - name: test-pipeline
+    inputs:
+      parameters:
+      - {name: epochs}
+      - {name: n_layers}
+    dag:
+      tasks:
+      - name: trianing
+        template: trianing
+        arguments:
+          parameters:
+          - {name: epochs, value: '{{inputs.parameters.epochs}}'}
+          - {name: n_layers, value: '{{inputs.parameters.n_layers}}'}
+  - name: trianing
+    container:
+      command: [python, -m, training.main, --epochs, '{{inputs.parameters.epochs}}',
+        --n-layers, '{{inputs.parameters.n_layers}}']
+      image: docker.io/cgarciae/test-pipeline:latest
+    inputs:
+      parameters:
+      - {name: epochs}
+      - {name: n_layers}
+    outputs:
+      artifacts:
+      - {name: mlpipeline-metrics, path: /mlpipeline-metrics.json}
+      - {name: mlpipeline-ui-metadata, path: /mlpipeline-ui-metadata.json}
+    metadata:
+      annotations: {pipelines.kubeflow.org/component_spec: '{"inputs": [{"name": "epochs",
+          "type": "Integer"}, {"name": "n_layers"}], "name": "Training"}'}
+  arguments:
+    parameters:
+    - {name: epochs, value: '10'}
+    - {name: n_layers, value: '6'}
+  serviceAccountName: pipeline-runner
